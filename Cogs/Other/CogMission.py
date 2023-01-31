@@ -30,42 +30,43 @@ def GetPrixPlanete(planete): # recuperation des datas des planetes
 
     if planete == "Terre":
         cur.execute("""
-        select prix, suborbital_prix,orbite_basse_prix,orbite_haute_prix,retour_terre_prix,docking_prix,mission_habite_prix,place_sup_prix 
-        from planete 
+        select prix, suborbital_prix,orbite_basse_prix,orbite_haute_prix,retour_terre_prix,docking_prix,mission_habite_prix,place_sup_prix
+        from planete
         where nom_planete = \'Terre\';
         """)
-        
+
         return cur
 
     elif planete == "Pluton" or planete == "Autre":
         cur.execute("""
-        select prix, orbite_prix,sonde_prix,rover_prix,retour_terre_prix,survol_prix 
+        select prix, orbite_prix,sonde_prix,rover_prix,retour_terre_prix,survol_prix
         from planete
         where nom_planete = \'{}\';
         """.format(planete))
-   
+
         return cur
-    
+
     else :
         cur.execute("""
         select prix, orbite_prix,sonde_prix,rover_prix,retour_terre_prix,mission_habite_prix,place_sup_prix,survol_prix
-        from planete 
+        from planete
         where nom_planete = \'{}\';
         """.format(planete))
-    
+
         return cur
 
 
 
 def GetPrixSatellite(planete):
-    cur.execute("""SELECT satelite.satelite_nom, satelite.prix 
-    from satelite, planete 
-    where satelite.planete_id = planete.id 
+    cur.execute("""SELECT satelite.satelite_nom, satelite.prix
+    from satelite, planete
+    where satelite.planete_id = planete.id
     and planete.nom_planete = \'{}\';
     """.format(planete))
 
-   
+
     return cur
+#endregion
 
 def getEmbed(embed,planete): # Methode de traitement de l'affichage
 
@@ -86,7 +87,7 @@ def getEmbed(embed,planete): # Methode de traitement de l'affichage
             embed.add_field(name="Prix du __Vol Habité__:",value= "{}\n".format(convert(row[6])),inline=False )
             embed.add_field(name="Prix d'une __Place Supplémentaire__:",value= "{}\n".format(convert(row[7])),inline=False )
 
-        
+
     elif planete == "Pluton" or planete == "Autre":
 
         embed.title="Table des prix pour **__{}__**".format(planete)
@@ -99,7 +100,7 @@ def getEmbed(embed,planete): # Methode de traitement de l'affichage
             embed.add_field(name="Prix du __Retour sur Terre__:",value= "{}\n".format(convert(row[4])),inline=False )
             embed.add_field(name="Prix du __Survol__:",value= "{}\n".format(convert(row[5])),inline=False )
 
-        
+
     else:
         embed.title="Table des prix pour **__{}__**".format(planete)
         embed.description="Les prix doivent **s'additionner** selon les besoins de la **mission**"
@@ -113,19 +114,19 @@ def getEmbed(embed,planete): # Methode de traitement de l'affichage
             embed.add_field(name="Prix d'une __Place Supplémentaire__:",value= "{}\n".format(convert(row[6])),inline=False )
             embed.add_field(name="Prix du __Survol__:",value= "{}\n".format(convert(row[7])),inline=False )
 
-        
+
     return embed
 def formatNomPlanete(planete):
     planete = str(planete).capitalize()
     planete = planete.replace('é','e')
     planete = planete.replace('è','e')
     return planete
-    
+
 def convert(val):
 
     if val >= 1000000000:
         val = "{} milliards".format(val/1000000000)
-    elif val < 1000000000 : 
+    elif val < 1000000000 :
         val = "{} millions".format(val/1000000)
     return val
 
@@ -147,22 +148,22 @@ class MyModal(discord.ui.Modal):
         embed.add_field(name="Coûts ", value="{}\n({})".format(convert(self.missionObj.GetPrix()), str(self.missionObj.GetPrix()) ))
         embed.add_field(name="Bénéfices",value="{}\n({})".format(convert(self.missionObj.GetRecette()), str(self.missionObj.GetRecette())))
         await interaction.response.edit_message(embed=embed,view=None)
-      
 
 
-class CogMission(commands.Cog): 
-   
+
+class CogMission(commands.Cog):
+
     def __init__(self, bot):
         self.bot = bot
-    
+
     @discord.slash_command(
         name="mission",
         description="Calculez les coûts et bénéfices de votre mission ici !",
     )
-    async def mission(self,ctx,planete):  
+    async def mission(self,ctx,planete):
 
         author = ctx.author
-#region Code horrible a refactor si possible 
+#region Code horrible a refactor si possible
 #------------------------------------------ Buttons -------------------------------------------
 
         buttonOui = Button(label="Oui",style=discord.ButtonStyle.primary)
@@ -182,10 +183,10 @@ class CogMission(commands.Cog):
                 embed = embedPrincipal
                 embed.clear_fields()
                 buttonOui.callback = CButtonSondeOui
-                buttonOui.callback = CButtonSondeNon
+                buttonNon.callback = CButtonSondeNon
                 embed.title="Y'aura-t-il une sonde ?"
                 await interaction.response.edit_message(embed=embed,view=view)
-            
+
 
         async def CButtonRoverNon(interaction):
             if interaction.user.id == author.id:
@@ -263,7 +264,7 @@ class CogMission(commands.Cog):
                     embed.title="Récapitulatif de votre mission: "
                     embed.add_field(name="Coûts: ", value=str(missionObj.GetPrix()))
                     embed.add_field(name="Bénéfices: ",value= str(missionObj.GetRecette()))
-                    await interaction.response.edit_message(embed=embed,view=None)    
+                    await interaction.response.edit_message(embed=embed,view=None)
                 else :
                     buttonOui.callback = CButtonVolHabOui
                     buttonNon.callback = CButtonVolHabNon
@@ -289,7 +290,7 @@ class CogMission(commands.Cog):
                 embed.add_field(name="Coûts", value="{}\n({})".format(convert(missionObj.GetPrix()), str(missionObj.GetPrix()) ))
                 embed.add_field(name="Bénéfices",value="{}\n({})".format(convert(missionObj.GetRecette()), str(missionObj.GetRecette())))
                 await interaction.response.edit_message(embed=embed,view=None)
-        
+
 
         async def CButtonPlaceSupOui(interaction):
             if interaction.user.id == author.id:
@@ -325,7 +326,7 @@ class CogMission(commands.Cog):
                 embed.clear_fields()
                 embed.title= "Le vol est-il prévu pour être en **Orbite basse** ? "
                 await interaction.response.edit_message(embed=embed,view=view)
-    
+
 
 
         async def CButtonOrbBOui(interaction):
@@ -380,7 +381,7 @@ class CogMission(commands.Cog):
                     embed.clear_fields()
                     embed.title="La mission est-elle prévue pour un vol Suborbital ?"
                     await interaction.response.edit_message(embed=embed,view=view)
-            
+
 
         async def CButtonSubOui(interaction):
             if interaction.user.id == author.id:
@@ -392,7 +393,7 @@ class CogMission(commands.Cog):
                 embed.clear_fields()
                 embed.title="La mission est-elle prévue avec un Retour sur Terre ?"
                 await interaction.response.edit_message(embed=embed,view=view)
-    
+
         async def CButtonSubNon(interaction):
             if interaction.user.id == author.id:
                 buttonOui.callback = CButtonRetourOui
@@ -403,15 +404,15 @@ class CogMission(commands.Cog):
                 await interaction.response.edit_message(embed=embed,view=view)
 
 #------------------------------------------------------------------------------------------------------------------------
-#endregion 
+#endregion
 
         missionObj = Mission()
 
         embedPrincipal = discord.Embed(color=0x00ff00)
 
         planete = formatNomPlanete(planete)
-    
-    
+
+
         if planete in missionObj.nomPlanete :
             if planete == "Lune":
                 embedPrincipal.set_author(name="Mission vers la Lune, satellite de la Terre par @{}".format(ctx.author.name))
@@ -425,7 +426,7 @@ class CogMission(commands.Cog):
             embed = embedPrincipal
             embed.clear_fields()
             missionObj.SetPlanete(planete)
-        
+
             if(planete != "Terre"):
                 buttonOui.callback = CButtonRoverOui
                 buttonNon.callback = CButtonRoverNon
@@ -440,7 +441,7 @@ class CogMission(commands.Cog):
         elif planete in missionObj.nomSat:
             missionObj.SetPlaneteBySat(planete)
             embedPrincipal.set_author(name="Mission vers {}, satellite de {} par @{}".format(missionObj.cible,missionObj.planete,ctx.author.name))
-            embed = embedPrincipal 
+            embed = embedPrincipal
             embed.clear_fields()
 
             if(missionObj.planete != "Terre"):
@@ -462,14 +463,14 @@ class CogMission(commands.Cog):
     @discord.slash_command(
         name="prix",
         description="Affichage de la table des prix de la planète choisie",
-    ) # fonction prenant en parametre le nom d'une planete et retourne toutes les info monetaire la concernant 
+    ) # fonction prenant en parametre le nom d'une planete et retourne toutes les info monetaire la concernant
     async def prix(self,ctx, arg):
         missionObj = Mission()
         embedPrincipal = discord.Embed(color=0x00ff00)
         embedPrincipal.set_thumbnail(url="https://www.crushpixel.com/big-static14/preview4/planet-space-with-stars-shiny-1674010.jpg")
 
         arg = formatNomPlanete(arg)
-    
+
         assert arg in missionObj.nomPlanete, await ctx.send(embed = discord.Embed(title = "Veuillez vérifier l'orthographe du nom de votre planète"))  # verif que la planete existe
 
         await ctx.respond(embed=getEmbed(embedPrincipal,arg))
@@ -477,7 +478,7 @@ class CogMission(commands.Cog):
     @discord.slash_command(
         name="satellite",
         description="Liste des satellites de la planète choisie et de leurs prix",
-    ) # Fonction permettant de renvoyer toutes les lunes d'une planete 
+    ) # Fonction permettant de renvoyer toutes les lunes d'une planete
     async def satellite(self,ctx, arg):
         missionObj = Mission()
         embeded = discord.Embed(color=0x00ff00)
@@ -486,16 +487,17 @@ class CogMission(commands.Cog):
         arg = formatNomPlanete(arg)
         assert arg in missionObj.nomPlanete, await ctx.send(embed = discord.Embed(title = "Veuillez vérifier l'orthographe de votre planète !")) # verif que la planete existe
         assert arg in missionObj.nomPlaneteSat, await ctx.send(embed = discord.Embed(title = "Il n'y a pas de satellites pour cette planète !")) # verif que la planete a un satellite
-    
+
         cur = GetPrixSatellite(arg)
-    
+
         embeded.title="Satellites de __{}__".format(arg)
-    
+
         for row in cur:
-       
+
             embeded.add_field(name="{}".format(row[0]), value="{}".format(convert(row[1])), inline=False)
 
         await ctx.respond(embed = embeded)
+
 
 def setup(bot): # this is called by Pycord to setup the cog
     bot.add_cog(CogMission(bot))

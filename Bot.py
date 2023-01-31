@@ -3,7 +3,8 @@ import discord
 import Cogs.Other.Planete as Planete
 from Cogs.Other.Mission import Mission
 
-token=""
+TOKEN = os.environ.get('DEV_DISCORD_TOKEN')
+
 bot = discord.Bot()
 
 extensions = ['Cogs.Other.CogMission','Cogs.CogHelp']
@@ -15,4 +16,4 @@ async def on_ready():
     await bot.change_presence(activity=discord.Game(name="Spam Voyager 3 de /help"))
     print('Logged on as {0}!'.format(bot.user))
 
-bot.run(token)
+bot.run(TOKEN)

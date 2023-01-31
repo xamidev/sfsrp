@@ -1,3 +1,2 @@
-# Spaceflight Simulator RP Bot
-
-wip
+# SFS-RP-Bot
+Discord Bot for SFS 
