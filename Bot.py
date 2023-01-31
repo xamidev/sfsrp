@@ -3,7 +3,7 @@ import discord
 import Cogs.Other.Planete as Planete
 from Cogs.Other.Mission import Mission
 
-TOKEN = os.environ.get('DEV_DISCORD_TOKEN')
+TOKEN = os.environ.get('DISCORD_TOKEN')
 
 bot = discord.Bot()
 
