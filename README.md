@@ -7,14 +7,16 @@ Test unitaire requis, a choisir la methode que vous préferez :
 
 Avec DOCTEST :
 https://docs.python.org/3/library/doctest.html
- Ecrit directement les test dans la methode que l'on souhaite tester
+Ecrit directement les test dans la methode que l'on souhaite tester
  
-Avantage : 
+Avantage :
   - Plus facile a ecrire, tout est dans le meme .py
- Inconveniant : 
+
+Inconveniant : 
   - Le code est plus long
   - Code moin lisible 
   - Lors de la MEP (Mise ne prod) sur la branche main, faut les suppr, on fait pas tourner ca chez le client mdr
+
 
 Avec UNITTEST :
 https://docs.python.org/3/library/unittest.html
