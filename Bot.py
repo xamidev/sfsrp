@@ -1,7 +1,7 @@
 import os
 import discord
-import Cogs.Other.Planete as Planete
-from Cogs.Other.Mission import Mission
+import Model.Planete as Planete
+from Model.Mission import Mission
 
 TOKEN = os.environ.get('DISCORD_TOKEN')
 

@@ -3,74 +3,8 @@ import datetime
 from multiprocessing.sharedctypes import Value
 import sqlite3
 import os.path
-import Cogs.Other.Planete as Planete
-#region def
-
-try:
-    
-
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-    db_path = os.path.join(BASE_DIR, "sqlite.db")
-    conn = sqlite3.connect(db_path)
-    cur = conn.cursor()
-
-
-except sqlite3.Error as error:
-    print("Failed to read data from sqlite table", error)
-
-def GetNomPlanete(): 
-    cur.execute("""
-    select nom_planete 
-    from planete ;
-    """)
-    arr = []
-    for rows in cur:
-        for row in rows:
-            arr.append(row)
-    
-    return arr
-
-def GetNomSat(): 
-    cur.execute("""
-    select satelite_nom 
-    from satelite ;
-    """)
-    arr = []
-    for rows in cur:
-        for row in rows:
-            arr.append(row)
-    
-    return arr
-
-def GetNomPlaneteSat(): 
-    cur.execute("""
-    select planete.nom_planete  
-    from satelite, planete
-    where satelite.planete_id = planete.id;
-    """)
-    arr = []
-    for rows in cur:
-        for row in rows:
-            arr.append(row)
-    
-    return arr
-
-def GetNomPlaneteBySat(sat): 
-    cur.execute("""
-    select planete.nom_planete  
-    from satelite, planete
-    where satelite.planete_id = planete.id
-    and satelite_nom  = \'{}\';
-    """.format(sat))
-    return str(cur.fetchone()[0])
-
-def GetSatPrice(sat):
-    cur.execute("""
-    select prix 
-    from satelite 
-    where satelite_nom =  \'{}\';
-    """.format(sat))
-    return float(cur.fetchone()[0])
+import Model.Planete as Planete
+from DataAccess import MissionDataAccess #a rectifier
 
 def convert(val):
 
@@ -79,15 +13,11 @@ def convert(val):
     elif val < 1000000000 : 
         val = "{} Million".format(val/1000000)
     return val
-
-
-#endregion
-
-
+    
 class Mission():
-    nomPlanete = GetNomPlanete()
-    nomPlaneteSat = GetNomPlaneteSat()
-    nomSat = GetNomSat()
+    nomPlanete = MissionDataAccess.GetNomPlanete()
+    nomPlaneteSat = MissionDataAccess.GetNomPlaneteSat()
+    nomSat = MissionDataAccess.GetNomSat()
     planete = ""
     cible = ""
     objectifPlanete = None
@@ -111,10 +41,10 @@ class Mission():
              
 
     def SetPlaneteBySat(self,sat):
-        planete = GetNomPlaneteBySat(sat)
+        planete = MissionDataAccess.GetNomPlaneteBySat(sat)
         self.cible = sat
         self.SetPlanete(planete)
-        self.objectifPlanete.add(GetSatPrice(sat))
+        self.objectifPlanete.add(MissionDataAccess.GetSatPrice(sat))
         
 
     def Suborbital(self):
@@ -202,7 +132,3 @@ class Mission():
 
     def GetRDTime(self):
         return datetime.datetime(2100,10,1) - datetime.datetime.now().day
-
-
-
-

@@ -4,7 +4,7 @@ from discord.ui import Button , View
 from discord.ui import Modal
 import sqlite3
 import os.path
-from Cogs.Other.Mission import Mission
+from Model.Mission import Mission
 
 liens = {"Terre": "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d9/Earth_by_the_EPIC_Team_on_21_April_2018.png/280px-Earth_by_the_EPIC_Team_on_21_April_2018.png",
          "Venus": "https://www.astro-rennes.com/planetes/images/venus/detail_venus.jpg",
@@ -66,7 +66,7 @@ def GetPrixSatellite(planete):
 
 
     return cur
-#endregion
+#
 
 def getEmbed(embed,planete): # Methode de traitement de l'affichage
 
@@ -163,7 +163,7 @@ class CogMission(commands.Cog):
     async def mission(self,ctx,planete):
 
         author = ctx.author
-#region Code horrible a refactor si possible
+# Code horrible a refactor si possible
 #------------------------------------------ Buttons -------------------------------------------
 
         buttonOui = Button(label="Oui",style=discord.ButtonStyle.primary)
@@ -404,7 +404,7 @@ class CogMission(commands.Cog):
                 await interaction.response.edit_message(embed=embed,view=view)
 
 #------------------------------------------------------------------------------------------------------------------------
-#endregion
+#
 
         missionObj = Mission()
 
